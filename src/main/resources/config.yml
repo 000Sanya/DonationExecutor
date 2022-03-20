@@ -140,16 +140,12 @@ show-big-announcement: true
 # Сколько секунд будет висеть оповещение о донате
 announcement-duration-seconds: 3
 
-# Сколько блоков говна игроки будут получать в инвентарь от ShitToInventory
-dirt-amount: 10
 # Сколько алмазов игроки будут получать в инвентарь от GiveDiamonds
 diamonds-amount: 4
 # Сколько хлеба игроки будут получать в инвентарь от GiveBread
 bread-amount: 4
 # Радиус взрыва от BigBoom
 big-boom-radius: 20
-# Количество сотрудников НКВД при их вызове
-nkvd-officers-amount: 3
 
 # ДЛЯ КОРРЕКТНОГО ОТОБРАЖЕНИЯ КАСТОМНЫХ СКИНОВ ПЛАГИНА У ИГРОКОВ ДОЛЖЕН БЫТЬ УСТАНОВЛЕН МОД OPTIFINE - https://optifine.net/downloads
 # ЧТОБЫ ОТКЛЮЧИТЬ УВЕДОМЛЕНИЯ О НЕОБХОДИМОСТИ УСТАНОВИТЬ ОПТИФАЙН, ИЗМЕНИТЕ ЗНАЧЕНИЕ НИЖЕ С "true" НА "false"
@@ -164,8 +160,6 @@ notify-about-optifine: true
 # https://download.mc-packs.net/pack/5cd9b26a954b46683eeea1b7df1cc0fbe136f79f.zip
 force-download-resourcepack: true
 
-# Фильтр ников для твитча: true - вкл, false - выкл
-twitch-filter: true
 # Блеклист субстрок для фильтра
 BlacklistedSubstrings:
     - негр
