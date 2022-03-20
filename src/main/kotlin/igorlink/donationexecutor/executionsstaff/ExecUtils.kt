@@ -1,28 +1,26 @@
-package igorlink.donationexecutor.executionsstaff;
+package igorlink.donationexecutor.executionsstaff
 
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.entity.Player
+import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
+import java.util.List
 
-import java.util.List;
-
-public class ExecUtils {
-
-    public static void giveToPlayer(Player player, Material material, int amount, String donationUsername, String itemName) {
-        ItemStack itemStack = new ItemStack(material, amount);
-        ItemMeta meta = itemStack.getItemMeta();
-        meta.setDisplayName(itemName);
-        meta.setLore(List.of("§7Подарочек от §e" + donationUsername));
-        itemStack.setItemMeta(meta);
-        player.getWorld().dropItemNaturally(player.getLocation().clone().add(player.getLocation().getDirection().setY(0).normalize()), itemStack);
+object ExecUtils {
+    fun giveToPlayer(player: Player, material: Material?, amount: Int, donationUsername: String, itemName: String?) {
+        val itemStack = ItemStack(material!!, amount)
+        val meta = itemStack.itemMeta
+        meta.setDisplayName(itemName)
+        meta.lore = List.of("§7Подарочек от §e$donationUsername")
+        itemStack.itemMeta = meta
+        player.world.dropItemNaturally(player.location.clone().add(player.location.direction.setY(0).normalize()), itemStack)
     }
 
-    public static void giveToPlayer(Player player, Material material, int amount, String donationUsername) {
-        ItemStack itemStack = new ItemStack(material, amount);
-        ItemMeta meta = itemStack.getItemMeta();
-        meta.setLore(List.of("§7Подарочек от §e" + donationUsername));
-        itemStack.setItemMeta(meta);
-        player.getWorld().dropItemNaturally(player.getLocation().clone().add(player.getLocation().getDirection().setY(0).normalize()), itemStack);
+    @JvmStatic
+    fun giveToPlayer(player: Player, material: Material?, amount: Int, donationUsername: String) {
+        val itemStack = ItemStack(material!!, amount)
+        val meta = itemStack.itemMeta
+        meta.lore = List.of("§7Подарочек от §e$donationUsername")
+        itemStack.itemMeta = meta
+        player.world.dropItemNaturally(player.location.clone().add(player.location.direction.setY(0).normalize()), itemStack)
     }
 }

@@ -1,67 +1,34 @@
-package igorlink.donationexecutor;
+package igorlink.donationexecutor
 
-import igorlink.command.DonateSubCommand;
-import igorlink.command.FilterSubCommand;
-import igorlink.command.ReloadSubCommand;
-import igorlink.donationexecutor.playersmanagement.StreamerPlayersManager;
-import igorlink.service.MainConfig;
-import igorlink.service.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
-import static igorlink.service.Utils.*;
+import org.bukkit.plugin.java.JavaPlugin
+import igorlink.donationexecutor.playersmanagement.StreamerPlayersManager
+import igorlink.service.MainConfig
+import igorlink.command.ReloadSubCommand
+import igorlink.command.DonateSubCommand
+import igorlink.command.FilterSubCommand
+import org.bukkit.Bukkit
 
-public final class DonationExecutor extends JavaPlugin {
-    private static Boolean isRunningStatus = true;
+class DonationExecutor : JavaPlugin() {
+    lateinit var streamerPlayersManager: StreamerPlayersManager
+    lateinit var executor: Executor
+    lateinit var mainConfig: MainConfig
 
-    public StreamerPlayersManager streamerPlayersManager;
-    private Executor executor;
-
-    private MainConfig mainConfig;
-
-    @Override
-    public void onEnable() {
-        mainConfig = new MainConfig();
-        mainConfig.reload(this);
-
-        executor = new Executor(this);
-        streamerPlayersManager = new StreamerPlayersManager(this);
-
-        getCommand("reload").setExecutor(new ReloadSubCommand(this));
-        getCommand("donate").setExecutor(new DonateSubCommand(this));
-        getCommand("filter").setExecutor(new FilterSubCommand());
-
-        Utils.fillTheSynonimousCharsHashMap();
-
-
-        Bukkit.getPluginManager().registerEvents(new GeneralEventListener(this),this);
-
+    override fun onEnable() {
+        mainConfig = MainConfig()
+        mainConfig.reload(this)
+        executor = Executor(this)
+        streamerPlayersManager = StreamerPlayersManager(this)
+        getCommand("reload")!!.setExecutor(ReloadSubCommand(this))
+        getCommand("donate")!!.setExecutor(DonateSubCommand(this))
+        getCommand("filter")!!.setExecutor(FilterSubCommand())
+        Bukkit.getPluginManager().registerEvents(GeneralEventListener(this), this)
     }
 
-    @Override
-    public void onDisable() {
-        try {
-            isRunningStatus = false;
-            streamerPlayersManager.stop();
-        } catch (InterruptedException e) {
-            logToConsole("Какая-то ебаная ошибка, похуй на нее вообще");
-        }
+    override fun onDisable() {
+        streamerPlayersManager.stop()
     }
 
-
-    public static Boolean isRunning() {
-        return isRunningStatus;
-    }
-
-    public MainConfig getMainConfig() {
-        return mainConfig;
-    }
-
-    public void reloadMainConfig() {
-        mainConfig.reload(this);
-    }
-
-
-    public Executor getExecutor() {
-        return executor;
+    fun reloadMainConfig() {
+        mainConfig.reload(this)
     }
 }

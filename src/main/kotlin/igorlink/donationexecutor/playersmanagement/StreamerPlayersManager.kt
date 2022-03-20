@@ -1,91 +1,78 @@
-package igorlink.donationexecutor.playersmanagement;
+package igorlink.donationexecutor.playersmanagement
 
-import igorlink.donationexecutor.playersmanagement.donationalerts.DonationAlertsToken;
-import igorlink.donationexecutor.DonationExecutor;
-import igorlink.service.Utils;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
+import igorlink.donationexecutor.DonationExecutor
+import igorlink.donationexecutor.playersmanagement.donationalerts.DonationAlertsToken
+import igorlink.service.logToConsole
+import org.bukkit.scheduler.BukkitRunnable
+import kotlin.Throws
+import java.lang.InterruptedException
+import java.util.ArrayList
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-public class StreamerPlayersManager {
-    private final List<DonationAlertsToken> listOfDonationAlertsTokens = new ArrayList<>();
-    private DonationExecutor donationExecutor;
+class StreamerPlayersManager(private val donationExecutor: DonationExecutor) {
+    private val listOfDonationAlertsTokens: MutableList<DonationAlertsToken> = ArrayList()
 
     //Таймер будет выполнять донаты из очередей игроков каждые 2 сек, если они живы и онлайн - выполняем донат и убираем его из очереди
-    public StreamerPlayersManager(DonationExecutor donationExecutor) {
-        this.donationExecutor = donationExecutor;
-        getTokensFromConfig();
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!DonationExecutor.isRunning()) {
-                    this.cancel();
-                    return;
-                }
-
-                for (DonationAlertsToken token : listOfDonationAlertsTokens) {
-                    token.executeDonationsInQueues();
+    init {
+        tokensFromConfig
+        object : BukkitRunnable() {
+            override fun run() {
+                for (token in listOfDonationAlertsTokens) {
+                    token.executeDonationsInQueues()
                 }
             }
-        }.runTaskTimer(donationExecutor, 0, 40);
+        }.runTaskTimer(donationExecutor, 0, 40)
     }
 
-    private void getTokensFromConfig() {
-        Set<String> tokensStringList = donationExecutor.getMainConfig().getAmounts().keySet();
-        for (String token : tokensStringList) {
-            this.addTokenToList(token);
+    private val tokensFromConfig: Unit
+        private get() {
+            val tokensStringList = donationExecutor.mainConfig!!.getAmounts()!!.keys
+            for (token in tokensStringList) {
+                addTokenToList(token)
+            }
+            var numOfStreamerPlayers = 0
+            for (token in listOfDonationAlertsTokens) {
+                numOfStreamerPlayers += token.numberOfStreamerPlayers
+            }
+            logToConsole("Было добавлено §b" + listOfDonationAlertsTokens.size + " §fтокенов, с которыми связано §b" + numOfStreamerPlayers + " §fигроков.")
         }
 
-        int numOfStreamerPlayers = 0;
-        for (DonationAlertsToken token : listOfDonationAlertsTokens) {
-            numOfStreamerPlayers += token.getNumberOfStreamerPlayers();
-        }
-
-        Utils.logToConsole("Было добавлено §b" + listOfDonationAlertsTokens.size() + " §fтокенов, с которыми связано §b" + numOfStreamerPlayers + " §fигроков.");
-    }
-
-    public StreamerPlayer getStreamerPlayer(@NotNull String name) {
-        for (DonationAlertsToken token : listOfDonationAlertsTokens) {
+    fun getStreamerPlayer(name: String): StreamerPlayer? {
+        for (token in listOfDonationAlertsTokens) {
             if (token.getStreamerPlayer(name) != null) {
-                return token.getStreamerPlayer(name);
+                return token.getStreamerPlayer(name)
             }
         }
-        return null;
+        return null
     }
 
-    public void reload() {
-        for (DonationAlertsToken token : listOfDonationAlertsTokens) {
-            token.disconnect();
+    fun reload() {
+        for (token in listOfDonationAlertsTokens) {
+            token.disconnect()
         }
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                listOfDonationAlertsTokens.clear();
-                getTokensFromConfig();
+        object : BukkitRunnable() {
+            override fun run() {
+                listOfDonationAlertsTokens.clear()
+                tokensFromConfig
             }
-        }.runTaskLater(donationExecutor, 20);
-
+        }.runTaskLater(donationExecutor, 20)
     }
 
-    public void stop() throws InterruptedException {
-        for (DonationAlertsToken token : listOfDonationAlertsTokens) {
-            token.disconnect();
+    @Throws(InterruptedException::class)
+    fun stop() {
+        for (token in listOfDonationAlertsTokens) {
+            token.disconnect()
         }
-        Thread.sleep(1000);
-        listOfDonationAlertsTokens.clear();
+        Thread.sleep(1000)
+        listOfDonationAlertsTokens.clear()
     }
 
-    public void addToDonationsQueue(Donation donation) {
-        for (DonationAlertsToken token : listOfDonationAlertsTokens) {
-            token.addToDonationsQueue(donation);
+    fun addToDonationsQueue(donation: Donation?) {
+        for (token in listOfDonationAlertsTokens) {
+            token.addToDonationsQueue(donation!!)
         }
     }
 
-    private void addTokenToList(String token) {
-        listOfDonationAlertsTokens.add(new DonationAlertsToken(token, donationExecutor));
+    private fun addTokenToList(token: String) {
+        listOfDonationAlertsTokens.add(DonationAlertsToken(token, donationExecutor))
     }
-
 }

@@ -1,84 +1,64 @@
-package igorlink.donationexecutor.playersmanagement.donationalerts;
+package igorlink.donationexecutor.playersmanagement.donationalerts
 
-import igorlink.donationexecutor.DonationExecutor;
-import igorlink.donationexecutor.Executor;
-import igorlink.donationexecutor.playersmanagement.Donation;
-import igorlink.donationexecutor.playersmanagement.StreamerPlayer;
-import igorlink.service.Utils;
-import org.bukkit.Bukkit;
-import org.jetbrains.annotations.NotNull;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import igorlink.donationexecutor.DonationExecutor
+import igorlink.donationexecutor.playersmanagement.StreamerPlayer
+import java.net.URISyntaxException
+import org.bukkit.Bukkit
+import igorlink.donationexecutor.playersmanagement.Donation
+import igorlink.service.cutOffKopeykis
+import igorlink.service.logToConsole
+import java.util.*
 
-public class DonationAlertsToken {
-    private DonationAlertsConnection donationAlertsConnection;
-    private final List<StreamerPlayer> listOfStreamerPlayers = new ArrayList<>();
-    private final String token;
-    private final DonationExecutor donationExecutor;
+class DonationAlertsToken(val token: String, private val donationExecutor: DonationExecutor) {
+    private var donationAlertsConnection: DonationAlertsConnection = DonationAlertsConnection(this, donationExecutor)
+    private val listOfStreamerPlayers: MutableList<StreamerPlayer> = ArrayList()
 
-    public DonationAlertsToken(String token, DonationExecutor donationExecutor) {
-        this.token = token;
-        this.donationExecutor = donationExecutor;
+    init {
         try {
-            donationAlertsConnection = new DonationAlertsConnection(this, donationExecutor);
-            donationAlertsConnection.connect();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
+            donationAlertsConnection.connect()
+        } catch (e: URISyntaxException) {
+            e.printStackTrace()
         }
-
-        for (String spName : donationExecutor.getMainConfig().getAmounts().get(token).keySet()) {
-            listOfStreamerPlayers.add(new StreamerPlayer(spName, this, donationExecutor));
+        for (spName in donationExecutor.mainConfig!!.getAmounts()!![token]!!.keys) {
+            listOfStreamerPlayers.add(StreamerPlayer(spName, this, donationExecutor))
         }
     }
 
-    public String getToken() {
-        return token;
-    }
-
-    public void executeDonationsInQueues() {
-        for (StreamerPlayer sp : listOfStreamerPlayers) {
-            if ( (Bukkit.getPlayerExact(sp.getName()) != null) && (!(Objects.requireNonNull(Bukkit.getPlayerExact(sp.getName())).isDead())) ) {
-                    Donation donation = sp.takeDonationFromQueue();
-                    if (donation==null) {
-                        continue;
-                    }
-                    Utils.logToConsole("Отправлен на выполнение донат §b" + donation.getexecutionName() + "§f для стримера §b" + sp.getName() + "§f от донатера §b" + donation.getName());
-                    donationExecutor.getExecutor().doExecute(sp.getName(), donation.getName(), donation.getAmount(), donation.getexecutionName());
-            }
-
-        }
-    }
-
-    public StreamerPlayer getStreamerPlayer(@NotNull String name) {
-        for (StreamerPlayer p : listOfStreamerPlayers) {
-            if (p.getName().equals(name)) {
-                return p;
+    fun executeDonationsInQueues() {
+        for (sp in listOfStreamerPlayers) {
+            if (Bukkit.getPlayerExact(sp.name) != null && !Objects.requireNonNull(Bukkit.getPlayerExact(sp.name))!!.isDead) {
+                val donation = sp.takeDonationFromQueue() ?: continue
+                logToConsole("Отправлен на выполнение донат §b" + donation.executionName + "§f для стримера §b" + sp.name + "§f от донатера §b" + donation.name)
+                donationExecutor.executor!!.doExecute(sp.name, donation.name!!, donation.amount, donation.executionName!!)
             }
         }
-        return null;
+    }
+
+    fun getStreamerPlayer(name: String): StreamerPlayer? {
+        for (p in listOfStreamerPlayers) {
+            if (p.name == name) {
+                return p
+            }
+        }
+        return null
     }
 
     //Добавление доната в очередь
-    public void addToDonationsQueue(Donation donation) {
-        String execution;
-        for (StreamerPlayer sp : listOfStreamerPlayers) {
-            execution = sp.checkExecution(Utils.cutOffKopeykis(donation.getAmount()));
-            if (!(execution == null)) {
-                donation.setexecutionName(execution);
-                sp.putDonationToQueue(donation);
-                Utils.logToConsole("Донат от §b" + donation.getName() + "§f в размере §b" + donation.getAmount() + " руб.§f был обработан и отправлен в очередь на выполнение.");
-                return;
-            }
+    fun addToDonationsQueue(donation: Donation) {
+        val execution: String
+        for (sp in listOfStreamerPlayers) {
+            execution = sp.checkExecution(cutOffKopeykis(donation.amount))!!
+            donation.executionName = execution
+            sp.putDonationToQueue(donation)
+            logToConsole("Донат от §b" + donation.name + "§f в размере §b" + donation.amount + " руб.§f был обработан и отправлен в очередь на выполнение.")
+            return
         }
     }
 
-    public void disconnect() {
-        donationAlertsConnection.disconnect();
+    fun disconnect() {
+        donationAlertsConnection.disconnect()
     }
 
-    public int getNumberOfStreamerPlayers() {
-        return listOfStreamerPlayers.size();
-    }
+    val numberOfStreamerPlayers: Int
+        get() = listOfStreamerPlayers.size
 }

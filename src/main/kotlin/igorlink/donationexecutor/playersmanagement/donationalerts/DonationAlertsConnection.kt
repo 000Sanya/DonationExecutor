@@ -1,85 +1,70 @@
-package igorlink.donationexecutor.playersmanagement.donationalerts;
+package igorlink.donationexecutor.playersmanagement.donationalerts
 
-import igorlink.donationexecutor.playersmanagement.Donation;
-import io.socket.client.IO;
-import io.socket.client.Socket;
-import io.socket.emitter.Emitter;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.json.JSONException;
-import org.json.JSONObject;
-import java.net.URI;
-import java.net.URISyntaxException;
-import static igorlink.service.Utils.logToConsole;
+import org.bukkit.plugin.java.JavaPlugin
+import io.socket.client.IO
+import org.bukkit.scheduler.BukkitRunnable
+import igorlink.donationexecutor.playersmanagement.Donation
+import igorlink.service.logToConsole
+import io.socket.client.Socket
+import io.socket.emitter.Emitter
+import org.bukkit.Bukkit
+import kotlin.Throws
+import org.json.JSONException
+import org.json.JSONObject
+import java.net.URI
 
-public class DonationAlertsConnection {
-    private static final String DASERVER = "https://socket.donationalerts.ru:443";
-    private final Socket socket;
-    private final DonationAlertsToken donationAlertsToken;
+class DonationAlertsConnection(private val donationAlertsToken: DonationAlertsToken, javaPlugin: JavaPlugin) {
+    private val socket: Socket
 
-
-    public DonationAlertsConnection(DonationAlertsToken donationAlertsToken, JavaPlugin javaPlugin) throws URISyntaxException {
-        this.donationAlertsToken = donationAlertsToken;
-        URI url = new URI(DASERVER);
-        socket = IO.socket(url);
-
-        Emitter.Listener connectListener = (Object... arg0) -> {
-            socket.emit("add-user", new JSONObject()
-                    .put("token", donationAlertsToken.getToken())
-                    .put("type", "minor"));
-            logToConsole("Произведено успешное подключение для токена §b" + donationAlertsToken.getToken());
-        };
-        Emitter.Listener disconectListener = (Object... arg0) -> logToConsole("Произведено отключение для токена §b" + donationAlertsToken.getToken());
-        Emitter.Listener errorListener = (Object... arg0) -> logToConsole("Произошла ошибка подключения к Donation Alerts!");
-
-        Emitter.Listener donationListener = (Object... arg0) -> {
-
-            JSONObject json = new JSONObject((String) arg0[0]);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    String donationAmount;
-                    String donationUsername;
-
-
+    init {
+        val url = URI(DASERVER)
+        socket = IO.socket(url)
+        val connectListener = Emitter.Listener {
+            socket.emit("add-user", JSONObject()
+                .put("token", donationAlertsToken.token)
+                .put("type", "minor"))
+            logToConsole("Произведено успешное подключение для токена §b" + donationAlertsToken.token)
+        }
+        val disconectListener = Emitter.Listener { logToConsole("Произведено отключение для токена §b" + donationAlertsToken.token) }
+        val errorListener = Emitter.Listener { logToConsole("Произошла ошибка подключения к Donation Alerts!") }
+        val donationListener = Emitter.Listener { arg0 ->
+            val json = JSONObject(arg0[0] as String)
+            object : BukkitRunnable() {
+                override fun run() {
                     if (json.getInt("alert_type") != 1) {
-                        return;
+                        return
                     }
-
-                    if (json.isNull("username")) {
-                        donationUsername = "";
+                    val donationUsername = if (json.isNull("username")) {
+                        ""
                     } else {
-                        donationUsername = json.getString("username");
+                        json.getString("username")
                     }
-
-                    donationAmount = json.getString("amount_formatted");
-
-                    DonationAlertsConnection.this.donationAlertsToken.
-                            addToDonationsQueue(new Donation(
-                            Bukkit.getConsoleSender(),
-                            donationUsername,
-                            donationAmount)
-                            );
-
+                    val donationAmount = json.getString("amount_formatted")
+                    donationAlertsToken.addToDonationsQueue(Donation(
+                        Bukkit.getConsoleSender(),
+                        donationUsername,
+                        donationAmount)
+                    )
                 }
-            }.runTask(javaPlugin);
-        };
-
-
+            }.runTask(javaPlugin)
+        }
         socket.on(Socket.EVENT_CONNECT, connectListener)
-                .on(Socket.EVENT_DISCONNECT, disconectListener)
-                .on(Socket.EVENT_ERROR, errorListener)
-                .on("donation", donationListener);
-
+            .on(Socket.EVENT_DISCONNECT, disconectListener)
+            .on(Socket.EVENT_ERROR, errorListener)
+            .on("donation", donationListener)
     }
 
-
-    public void connect() throws JSONException {
-        socket.connect();
+    @Throws(JSONException::class)
+    fun connect() {
+        socket.connect()
     }
 
-    public void disconnect() throws JSONException {
-        socket.disconnect();
+    @Throws(JSONException::class)
+    fun disconnect() {
+        socket.disconnect()
+    }
+
+    companion object {
+        private const val DASERVER = "https://socket.donationalerts.ru:443"
     }
 }

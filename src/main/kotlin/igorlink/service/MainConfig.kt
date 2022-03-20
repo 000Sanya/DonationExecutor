@@ -1,102 +1,64 @@
-package igorlink.service;
+package igorlink.service
 
-import igorlink.donationexecutor.DonationExecutor;
-import org.bukkit.configuration.file.FileConfiguration;
+import igorlink.donationexecutor.DonationExecutor
+import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.configuration.ConfigurationSection
+import java.util.*
 
-import java.util.*;
-
-public class MainConfig {
-    private int diamondsAmount;
-    private int breadAmount;
-    private int bigBoomRadius;
-    private int timeForAnnouncement;
-    private String token;
-    private List<String> listOfBlackListedSubstrings = new ArrayList<>();
-    public List<String> listOfWhiteListedSubstrings = new ArrayList<>();
-    private boolean forceResourcePack;
-    private boolean optifineNotification;
-    public boolean showBigAnnouncement;
-
-    private Map<String, Map<String, Map<String, String>>> amounts;
+class MainConfig {
+    var diamondsAmount = 0
+        private set
+    var breadAmount = 0
+        private set
+    var bigBoomRadius = 0
+        private set
+    var timeForAnnouncement = 0
+        private set
+    private var token: String? = null
+    var listOfBlackListedSubstrings: List<String> = ArrayList()
+        private set
+    var listOfWhiteListedSubstrings: List<String> = ArrayList()
+    var isForceResourcePack = false
+        private set
+    var isOptifineNotificationOn = false
+        private set
+    var showBigAnnouncement = false
+    private lateinit var amounts: MutableMap<String, Map<String, Map<String, String?>>>
 
     //Загрузка данных из конфигфайла с указанным параметром перезагрузки
-    public void reload(DonationExecutor donationExecutor) {
-        donationExecutor.saveDefaultConfig();
-        donationExecutor.reloadConfig();
-
-        FileConfiguration config = donationExecutor.getConfig();
-
-        diamondsAmount = config.getInt("diamonds-amount");
-        breadAmount = config.getInt("bread-amount");
-        bigBoomRadius = config.getInt("big-boom-radius");
-        timeForAnnouncement = config.getInt("announcement-duration-seconds");
-        timeForAnnouncement = config.getInt("announcement-duration-seconds");
-
-        token = config.getString("DonationAlertsToken");
-        listOfBlackListedSubstrings = config.getStringList("BlacklistedSubstrings");
-        listOfWhiteListedSubstrings = config.getStringList("WhitelistedSubstrings");
-
-        showBigAnnouncement = config.getBoolean("show-big-announcement");
-        optifineNotification = config.getBoolean("notify-about-optifine");
-        forceResourcePack = config.getBoolean("force-download-resourcepack");
-
-        amounts = new HashMap<>();
-
-        var tokens = config.getConfigurationSection("donation-amounts");
-        for (var token : Objects.requireNonNull(tokens).getKeys(false)) {
-            var playersMap = new HashMap<String, Map<String, String>>();
-
-            var players = tokens.getConfigurationSection(token);
-
-            for (var player : Objects.requireNonNull(players).getKeys(false)) {
-                var amountMap = new HashMap<String, String>();
-
-                var amountSection = players.getConfigurationSection(player);
-
-                for (var amountKey : Objects.requireNonNull(amountSection).getKeys(false)) {
-                    amountMap.put(amountKey, amountSection.getString(amountKey));
+    fun reload(donationExecutor: DonationExecutor) {
+        donationExecutor.saveDefaultConfig()
+        donationExecutor.reloadConfig()
+        val config = donationExecutor.config
+        diamondsAmount = config.getInt("diamonds-amount")
+        breadAmount = config.getInt("bread-amount")
+        bigBoomRadius = config.getInt("big-boom-radius")
+        timeForAnnouncement = config.getInt("announcement-duration-seconds")
+        timeForAnnouncement = config.getInt("announcement-duration-seconds")
+        token = config.getString("DonationAlertsToken")
+        listOfBlackListedSubstrings = config.getStringList("BlacklistedSubstrings")
+        listOfWhiteListedSubstrings = config.getStringList("WhitelistedSubstrings")
+        showBigAnnouncement = config.getBoolean("show-big-announcement")
+        isOptifineNotificationOn = config.getBoolean("notify-about-optifine")
+        isForceResourcePack = config.getBoolean("force-download-resourcepack")
+        amounts = HashMap()
+        val tokens = config.getConfigurationSection("donation-amounts")!!
+        for (token in Objects.requireNonNull(tokens).getKeys(false)) {
+            val playersMap = HashMap<String, Map<String, String?>>()
+            val players = tokens.getConfigurationSection(token)
+            for (player in Objects.requireNonNull(players)!!.getKeys(false)) {
+                val amountMap = HashMap<String, String?>()
+                val amountSection = players!!.getConfigurationSection(player)
+                for (amountKey in Objects.requireNonNull(amountSection)!!.getKeys(false)) {
+                    amountMap[amountKey] = amountSection!!.getString(amountKey)
                 }
-
-                playersMap.put(player, amountMap);
+                playersMap[player] = amountMap
             }
-
-            amounts.put(token, playersMap);
+            amounts[token] = playersMap
         }
     }
 
-    public boolean isForceResourcePack() {
-        return forceResourcePack;
-    }
-
-    public boolean isOptifineNotificationOn() {
-        return optifineNotification;
-    }
-
-    public boolean getshowBigAnnouncement() {
-        return showBigAnnouncement;
-    }
-
-    public int getBigBoomRadius() {
-        return bigBoomRadius;
-    }
-
-    public int getDiamondsAmount() {
-        return diamondsAmount;
-    }
-
-    public int getBreadAmount() {
-        return breadAmount;
-    }
-
-    public int getTimeForAnnouncement() {
-        return timeForAnnouncement;
-    }
-
-    public List<String> getListOfBlackListedSubstrings() {
-        return listOfBlackListedSubstrings;
-    }
-
-    public Map<String, Map<String, Map<String, String>>> getAmounts() {
-        return amounts;
+    fun getAmounts(): Map<String, Map<String, Map<String, String?>>>? {
+        return amounts
     }
 }
