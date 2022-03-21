@@ -32,7 +32,7 @@ class DonationAlertsToken(
             if (Bukkit.getPlayerExact(sp.name) != null && !Objects.requireNonNull(Bukkit.getPlayerExact(sp.name))!!.isDead) {
                 val donation = sp.takeDonationFromQueue() ?: continue
                 logToConsole("Отправлен на выполнение донат §b" + donation.executionName + "§f для стримера §b" + sp.name + "§f от донатера §b" + donation.name)
-                donationExecutor.executor.doExecute(sp.name, donation.name, donation.amount, donation.executionName!!)
+                donationExecutor.executor.doExecute(sp.name, donation.name, donation.amount, donation.executionName)
             }
         }
     }

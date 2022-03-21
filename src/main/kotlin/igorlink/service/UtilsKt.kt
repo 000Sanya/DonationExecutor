@@ -27,22 +27,16 @@ fun decodeUsingBigInteger(hexString: String): ByteArray? {
 }
 
 fun announce(donaterName: String, subText: String, alterSubtext: String, player: Player, donationAmount: String, bigAnnounce: Boolean, mainConfig: MainConfig) {
-    var _donaterName = donaterName
+    val _donaterName = donaterName.ifBlank { "Кто-то" }
     if (bigAnnounce) {
-        if (donaterName == "") {
-            _donaterName = "Кто-то"
-        }
         if (mainConfig.showBigAnnouncement) {
             player.sendTitle("§c$_donaterName", "§f$subText за §b$donationAmount§f руб.", 7, mainConfig.timeForAnnouncement * 20, 7)
         }
         player.sendMessage("§c[DE] §fДонатер §c$_donaterName", "§f$subText за §b$donationAmount§f руб.")
     }
-    if (_donaterName == "") {
-        _donaterName = "Кто-то"
-    }
     for (p in Bukkit.getOnlinePlayers()) {
         if (p.name != player.name) {
-            p.sendMessage("§c[DE] §fДонатер §c" + _donaterName + " §f" + alterSubtext + " §b" + player.name + " за §b" + donationAmount + "§f руб.")
+            p.sendMessage("§c[DE] §fДонатер §c$_donaterName §f$alterSubtext §b${player.name} за §b$donationAmount§f руб.")
         }
     }
 }
@@ -175,4 +169,10 @@ inline fun JavaPlugin.runTask(crossinline block: () -> Unit) {
     object : BukkitRunnable() {
         override fun run() = block()
     }.runTask(this)
+}
+
+inline fun JavaPlugin.runTaskLater(delay: Long, crossinline block: () -> Unit) {
+    object : BukkitRunnable() {
+        override fun run() = block()
+    }.runTaskLater(this, delay)
 }
