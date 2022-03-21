@@ -65,7 +65,7 @@ class StreamerPlayer(
     }
 
     //Взять донат из очереди и убрать его из нее
-    fun takeDonationFromQueue(): Donation {
+    fun takeDonationFromQueue(): Donation? {
         return listOfQueuedDonations.poll()
     }
 
