@@ -54,6 +54,7 @@ class Executor(val donationExecutor: DonationExecutor) {
         onExecute("SpawnTamedDog", ::spawnTamedDog)
         onExecute("SpawnTamedCat", ::spawnTamedCat)
         onExecute("HealPlayer", ::healPlayer)
+        onExecute("ZaOrdu", ::spawnAgresiveWolf)
     }
 
     fun doExecute(streamerName: String, donationUsername: String, fullDonationAmount: String, executionName: String) {
@@ -228,7 +229,6 @@ class Executor(val donationExecutor: DonationExecutor) {
                 e.target = player
                 when (e) {
                     is Cat -> {
-                        e.owner = null
                         player.sendMessage("+")
                     }
                     is Wolf -> e.isSitting = false
@@ -319,5 +319,21 @@ class Executor(val donationExecutor: DonationExecutor) {
     private fun healPlayer(player: Player, donationUsername: String, donationAmount: String) {
         announce(donationUsername, "полностью вас вылечил", "полностью вылечил", player, donationAmount, true, donationExecutor.mainConfig)
         player.health = Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH))!!.value
+    }
+
+    private fun spawnAgresiveWolf(player: Player, donationUsername: String, donationAmount: String) {
+        announce(donationUsername, "ЗА ОРДУ!", "ЛОК'ТАР ОГАР!", player, donationAmount, true, donationExecutor.mainConfig)
+        (0 until kotlin.random.Random.nextInt(10,20)).forEach {
+            (player.world.spawnEntity(player.location, EntityType.WOLF) as Wolf).apply {
+                target = player
+                maxHealth = 20.0
+                customName = donationUsername
+            }
+        }
+    }
+
+    private fun donateScreamer(player: Player, donationUsername: String, donationAmount: String) {
+        announce(donationUsername, "отправил страшилку:3", "отправил страшилку:3", player, donationAmount, true, donationExecutor.mainConfig)
+
     }
 }
