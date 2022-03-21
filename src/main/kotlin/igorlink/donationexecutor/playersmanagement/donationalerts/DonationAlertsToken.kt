@@ -1,15 +1,18 @@
 package igorlink.donationexecutor.playersmanagement.donationalerts
 
 import igorlink.donationexecutor.DonationExecutor
-import igorlink.donationexecutor.playersmanagement.StreamerPlayer
-import java.net.URISyntaxException
-import org.bukkit.Bukkit
 import igorlink.donationexecutor.playersmanagement.Donation
+import igorlink.donationexecutor.playersmanagement.StreamerPlayer
 import igorlink.service.cutOffKopeykis
 import igorlink.service.logToConsole
+import org.bukkit.Bukkit
+import java.net.URISyntaxException
 import java.util.*
 
-class DonationAlertsToken(val token: String, private val donationExecutor: DonationExecutor) {
+class DonationAlertsToken(
+    val token: String,
+    private val donationExecutor: DonationExecutor,
+) {
     private var donationAlertsConnection: DonationAlertsConnection = DonationAlertsConnection(this, donationExecutor)
     private val listOfStreamerPlayers: MutableList<StreamerPlayer> = ArrayList()
 
@@ -19,7 +22,7 @@ class DonationAlertsToken(val token: String, private val donationExecutor: Donat
         } catch (e: URISyntaxException) {
             e.printStackTrace()
         }
-        for (spName in donationExecutor.mainConfig!!.getAmounts()!![token]!!.keys) {
+        for (spName in donationExecutor.mainConfig.getAmounts()[token]!!.keys) {
             listOfStreamerPlayers.add(StreamerPlayer(spName, this, donationExecutor))
         }
     }
@@ -27,9 +30,9 @@ class DonationAlertsToken(val token: String, private val donationExecutor: Donat
     fun executeDonationsInQueues() {
         for (sp in listOfStreamerPlayers) {
             if (Bukkit.getPlayerExact(sp.name) != null && !Objects.requireNonNull(Bukkit.getPlayerExact(sp.name))!!.isDead) {
-                val donation = sp.takeDonationFromQueue() ?: continue
+                val donation = sp.takeDonationFromQueue()
                 logToConsole("Отправлен на выполнение донат §b" + donation.executionName + "§f для стримера §b" + sp.name + "§f от донатера §b" + donation.name)
-                donationExecutor.executor!!.doExecute(sp.name, donation.name!!, donation.amount, donation.executionName!!)
+                donationExecutor.executor.doExecute(sp.name, donation.name ?: "", donation.amount, donation.executionName!!)
             }
         }
     }
@@ -45,11 +48,9 @@ class DonationAlertsToken(val token: String, private val donationExecutor: Donat
 
     //Добавление доната в очередь
     fun addToDonationsQueue(donation: Donation) {
-        val execution: String
         for (sp in listOfStreamerPlayers) {
-            execution = sp.checkExecution(cutOffKopeykis(donation.amount))!!
-            donation.executionName = execution
-            sp.putDonationToQueue(donation)
+            val execution = sp.checkExecution(cutOffKopeykis(donation.amount))!!
+            sp.putDonationToQueue(donation.copy(executionName = execution))
             logToConsole("Донат от §b" + donation.name + "§f в размере §b" + donation.amount + " руб.§f был обработан и отправлен в очередь на выполнение.")
             return
         }

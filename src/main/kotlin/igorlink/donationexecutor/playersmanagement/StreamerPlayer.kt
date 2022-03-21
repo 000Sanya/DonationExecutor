@@ -1,18 +1,21 @@
 package igorlink.donationexecutor.playersmanagement
 
-import igorlink.donationexecutor.playersmanagement.donationalerts.DonationAlertsToken
 import igorlink.donationexecutor.DonationExecutor
-import igorlink.donationexecutor.Executor
-import org.bukkit.Bukkit
+import igorlink.donationexecutor.playersmanagement.donationalerts.DonationAlertsToken
 import igorlink.service.logToConsole
+import org.bukkit.Bukkit
 import org.bukkit.entity.Item
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
 import java.util.*
 
-class StreamerPlayer(val name: String, donationAlertsToken: DonationAlertsToken, donationExecutor: DonationExecutor) {
-    private val listOfDeathDropItems: MutableList<Item> = ArrayList()
+class StreamerPlayer(
+    val name: String,
+    donationAlertsToken: DonationAlertsToken,
+    donationExecutor: DonationExecutor,
+) {
+    private val listOfDeathDropItems: MutableList<Item> = mutableListOf()
     private val listOfQueuedDonations: Queue<Donation> = LinkedList()
     private val listOfAmounts = HashMap<String, String>()
 
@@ -32,17 +35,15 @@ class StreamerPlayer(val name: String, donationAlertsToken: DonationAlertsToken,
                     setDeathDrop(deathDrop)
                 }
             },
-            donationExecutor)
+            donationExecutor
+        )
 
-
-        //Заполняем список сумм для донатов
-        var amount: String?
         for (execName in donationExecutor.executor.executionsNamesList) {
-            amount = donationExecutor.mainConfig!!.getAmounts()!![donationAlertsToken.token]!![name]!![execName]
+            val amount = donationExecutor.mainConfig.getAmounts()[donationAlertsToken.token]!![name]!![execName]
             if (amount != null) {
                 listOfAmounts[amount] = execName
             } else {
-                logToConsole("Сумма доната, необходимая для " + execName + " для стримера " + name + " не найдена. Проверьте правильность заполнения файла конфигурации DonationExecutor.yml в папке с именем плагина.")
+                logToConsole("Сумма доната, необходимая для $execName для стримера $name не найдена. Проверьте правильность заполнения файла конфигурации DonationExecutor.yml в папке с именем плагина.")
             }
         }
     }

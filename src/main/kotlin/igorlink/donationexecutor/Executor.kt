@@ -5,24 +5,19 @@ import igorlink.service.announce
 import igorlink.service.isBlackListed
 import igorlink.service.logToConsole
 import igorlink.service.sendSysMsgToPlayer
-import org.bukkit.entity.Player
-import org.bukkit.Material
-import org.bukkit.entity.EntityType
-import java.lang.Math
-import java.lang.StringBuilder
-import org.bukkit.inventory.ItemStack
-import org.bukkit.entity.Wolf
-import org.bukkit.entity.Cat
-import org.bukkit.entity.Tameable
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.attribute.Attribute
+import org.bukkit.entity.*
+import org.bukkit.inventory.ItemStack
 import java.util.*
+import kotlin.math.roundToInt
 
 class Executor(val donationExecutor: DonationExecutor) {
     private val donationActions: MutableMap<String, DonationAction> = mutableMapOf()
 
-    private inline fun MutableMap<String, DonationAction>.add(action: DonationAction) {
+    private fun MutableMap<String, DonationAction>.add(action: DonationAction) {
         put(action.executionName, action)
     }
 
@@ -131,10 +126,9 @@ class Executor(val donationExecutor: DonationExecutor) {
                     var temp = 0
                     var isUnique = false
                     while (!isUnique) {
-                        temp = Math.round(Math.random() * 35).toInt()
+                        temp = (Math.random() * 35).roundToInt()
                         isUnique = true
-                        var n: Int
-                        n = 0
+                        var n = 0
                         while (n < i) {
                             if (randoms[n] == temp) {
                                 isUnique = false
@@ -294,35 +288,28 @@ class Executor(val donationExecutor: DonationExecutor) {
         })
     }
 
-    fun doExecute(streamerName: String?, donationUsername: String, fullDonationAmount: String, executionName: String) {
-        val streamerPlayer = Bukkit.getPlayerExact(streamerName!!)
-        var canContinue = true
+    fun doExecute(streamerName: String, donationUsername: String, fullDonationAmount: String, executionName: String) {
+        val streamerPlayer = Bukkit.getPlayerExact(streamerName)
+
         //Определяем игрока (если он оффлайн - не выполняем донат и пишем об этом в консоль), а также определяем мир, местоположение и направление игрока
-        if (streamerPlayer == null) {
-            canContinue = false
-        } else if (streamerPlayer.isDead) {
-            canContinue = false
+        if (streamerPlayer == null || streamerPlayer.isDead) {
+            logToConsole("Донат от §b$donationUsername §f в размере §b$fullDonationAmount§f выполнен из-за того, что целевой стример был недоступен.")
+            return
         }
 
         //Если имя донатера не указано - устанавливаем в качестве имени "Кто-то"
         val validDonationUsername: String
         if (donationUsername == "") {
             validDonationUsername = "Аноним"
-        } else if (!isBlackListed(donationUsername,
-                donationExecutor.mainConfig)
-        ) {
+        } else if (!isBlackListed(donationUsername, donationExecutor.mainConfig.listOfBlackListedSubstrings)) {
             validDonationUsername = donationUsername
         } else {
             validDonationUsername = "Донатер"
-            assert(streamerPlayer != null)
             logToConsole("§eникнейм донатера §f$donationUsername§e был скрыт, как подозрительный")
-            streamerPlayer!!.sendActionBar("НИКНЕЙМ ДОНАТЕРА БЫЛ СКРЫТ")
-        }
-        if (!canContinue) {
-            logToConsole("Донат от §b$donationUsername §f в размере §b$fullDonationAmount§f выполнен из-за того, что целевой стример был недоступен.")
-            return
+            streamerPlayer.sendActionBar("НИКНЕЙМ ДОНАТЕРА БЫЛ СКРЫТ")
         }
 
-        donationActions[executionName]?.let { it.onAction(streamerPlayer!!, validDonationUsername, fullDonationAmount) }
+
+        donationActions[executionName]?.onAction(streamerPlayer, validDonationUsername, fullDonationAmount)
     }
 }

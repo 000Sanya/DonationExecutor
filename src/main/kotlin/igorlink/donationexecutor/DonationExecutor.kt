@@ -1,12 +1,10 @@
 package igorlink.donationexecutor
 
-import org.bukkit.plugin.java.JavaPlugin
+import igorlink.command.DonationExecutorCommand
 import igorlink.donationexecutor.playersmanagement.StreamerPlayersManager
 import igorlink.service.MainConfig
-import igorlink.command.ReloadSubCommand
-import igorlink.command.DonateSubCommand
-import igorlink.command.FilterSubCommand
 import org.bukkit.Bukkit
+import org.bukkit.plugin.java.JavaPlugin
 
 class DonationExecutor : JavaPlugin() {
     lateinit var streamerPlayersManager: StreamerPlayersManager
@@ -18,9 +16,7 @@ class DonationExecutor : JavaPlugin() {
         mainConfig.reload(this)
         executor = Executor(this)
         streamerPlayersManager = StreamerPlayersManager(this)
-        getCommand("reload")!!.setExecutor(ReloadSubCommand(this))
-        getCommand("donate")!!.setExecutor(DonateSubCommand(this))
-        getCommand("filter")!!.setExecutor(FilterSubCommand())
+        getCommand("donationexecutor")?.setExecutor(DonationExecutorCommand(this))
         Bukkit.getPluginManager().registerEvents(GeneralEventListener(this), this)
     }
 
@@ -29,6 +25,9 @@ class DonationExecutor : JavaPlugin() {
     }
 
     fun reloadMainConfig() {
+        reloadConfig()
+
         mainConfig.reload(this)
+        streamerPlayersManager.reload()
     }
 }

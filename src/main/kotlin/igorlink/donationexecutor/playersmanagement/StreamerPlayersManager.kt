@@ -4,9 +4,6 @@ import igorlink.donationexecutor.DonationExecutor
 import igorlink.donationexecutor.playersmanagement.donationalerts.DonationAlertsToken
 import igorlink.service.logToConsole
 import org.bukkit.scheduler.BukkitRunnable
-import kotlin.Throws
-import java.lang.InterruptedException
-import java.util.ArrayList
 
 class StreamerPlayersManager(private val donationExecutor: DonationExecutor) {
     private val listOfDonationAlertsTokens: MutableList<DonationAlertsToken> = ArrayList()
@@ -25,7 +22,7 @@ class StreamerPlayersManager(private val donationExecutor: DonationExecutor) {
 
     private val tokensFromConfig: Unit
         private get() {
-            val tokensStringList = donationExecutor.mainConfig!!.getAmounts()!!.keys
+            val tokensStringList = donationExecutor.mainConfig.getAmounts().keys
             for (token in tokensStringList) {
                 addTokenToList(token)
             }
@@ -57,7 +54,6 @@ class StreamerPlayersManager(private val donationExecutor: DonationExecutor) {
         }.runTaskLater(donationExecutor, 20)
     }
 
-    @Throws(InterruptedException::class)
     fun stop() {
         for (token in listOfDonationAlertsTokens) {
             token.disconnect()

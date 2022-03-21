@@ -1,8 +1,6 @@
 package igorlink.service
 
 import igorlink.donationexecutor.DonationExecutor
-import org.bukkit.configuration.file.FileConfiguration
-import org.bukkit.configuration.ConfigurationSection
 import java.util.*
 
 class MainConfig {
@@ -58,7 +56,7 @@ class MainConfig {
         }
     }
 
-    fun getAmounts(): Map<String, Map<String, Map<String, String?>>>? {
+    fun getAmounts(): Map<String, Map<String, Map<String, String?>>> {
         return amounts
     }
 }

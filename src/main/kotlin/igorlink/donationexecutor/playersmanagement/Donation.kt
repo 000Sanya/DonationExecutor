@@ -1,18 +1,17 @@
 package igorlink.donationexecutor.playersmanagement
 
-import org.bukkit.command.CommandSender
+data class Donation internal constructor(
+    val name: String,
+    val amount: String,
+    val executionName: String,
+)
 
-class Donation(private val sender: CommandSender, _username: String, _amount: String) {
-    var name: String? = null
-    val amount: String
-    var executionName: String? = null
-
-    init {
-        if (_username == "") {
-            name = "Аноним"
-        } else {
-            name = _username
-        }
-        amount = _amount
-    }
-}
+fun Donation(
+    name: String,
+    amount: String,
+    executionName: String? = null,
+) = Donation(
+    name = name.ifBlank { "Аноним" },
+    amount = amount,
+    executionName = executionName ?: ""
+)

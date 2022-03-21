@@ -2,6 +2,8 @@ package igorlink.service
 
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.scheduler.BukkitRunnable
 import java.math.BigInteger
 import java.util.*
 import java.util.regex.Pattern
@@ -67,8 +69,8 @@ private val mapOfSynonimousChars = mapOf(
     'о' to listOf('o', '0'),
     'a' to listOf('а'),
     'а' to listOf('a'),
-    'и' to listOf('i', 'n', 'e', 'е', '|', 'l', '!','1', '3', 'й'),
-    'i' to listOf('1', 'и', 'e', 'е', '|', 'l', '!','й'),
+    'и' to listOf('i', 'n', 'e', 'е', '|', 'l', '!', '1', '3', 'й'),
+    'i' to listOf('1', 'и', 'e', 'е', '|', 'l', '!', 'й'),
     'с' to listOf('c', 's', '$', '5'),
     's' to listOf('c', 'с', '$', '5'),
     'c' to listOf('s', 'с', '$', '5'),
@@ -86,13 +88,13 @@ private val mapOfSynonimousChars = mapOf(
     'k' to listOf('к'),
     'к' to listOf('k'),
     '0' to listOf('о', 'o'),
-    '3' to listOf('e', 'е','з'),
+    '3' to listOf('e', 'е', 'з'),
     '4' to listOf('ч'),
     '5' to listOf('с', 'c', 's'),
     '9' to listOf('r', 'я'),
 )
 
-fun isBlackListed(text: String, mainConfig: MainConfig): Boolean {
+fun isBlackListed(text: String, blackListedSubstrings: List<String>): Boolean {
     var validationText = text.lowercase(Locale.getDefault())
     val pattern = Pattern.compile("[l1i]*[\\-]*[l1i]*")
     val matcher = pattern.matcher(validationText)
@@ -100,14 +102,16 @@ fun isBlackListed(text: String, mainConfig: MainConfig): Boolean {
     if (matcher.find() && matcher.group().isNotEmpty()) {
         validationText = validationText.replace(matcher.group(), "н")
     }
-    validationText = validationText.replace("_", "")
-    validationText = validationText.replace(" ", "")
-    validationText = validationText.replace(",", "")
-    validationText = validationText.replace(".", "")
-    validationText = validationText.replace("-", "")
-    validationText = validationText.replace("%", "")
-    validationText = validationText.replace("*", "")
-    validationText = validationText.replace("?", "")
+
+    validationText = validationText
+        .replace("_", "")
+        .replace(" ", "")
+        .replace(",", "")
+        .replace(".", "")
+        .replace("-", "")
+        .replace("%", "")
+        .replace("*", "")
+        .replace("?", "")
 
     if (validationText.isEmpty()) {
         return false
@@ -117,7 +121,7 @@ fun isBlackListed(text: String, mainConfig: MainConfig): Boolean {
         return true
     }
 
-    for (ss in mainConfig.listOfBlackListedSubstrings) {
+    for (ss in blackListedSubstrings) {
         for (i in 0..validationText.length - ss.length) {
             var tempi = i
             for (j in 0..ss.length) {
@@ -165,4 +169,10 @@ fun isBlackListed(text: String, mainConfig: MainConfig): Boolean {
         }
     }
     return false
+}
+
+inline fun JavaPlugin.runTask(crossinline block: () -> Unit) {
+    object : BukkitRunnable() {
+        override fun run() = block()
+    }.runTask(this)
 }

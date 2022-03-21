@@ -4,9 +4,7 @@
 
 plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    java
     kotlin("jvm") version "1.6.10"
-    `maven-publish`
 }
 
 repositories {
@@ -36,12 +34,6 @@ version = "0.3.6"
 description = "DonationExecutor"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
-publishing {
-    publications.create<MavenPublication>("maven") {
-        from(components["java"])
-    }
-}
-
-tasks.withType<JavaCompile>() {
+tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
