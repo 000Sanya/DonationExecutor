@@ -17,7 +17,7 @@ class StreamerPlayer(
 ) {
     private val listOfDeathDropItems: MutableList<Item> = mutableListOf()
     private val listOfQueuedDonations: Queue<Donation> = LinkedList()
-    private val listOfAmounts = HashMap<String, String>()
+    private val listOfAmounts = HashMap<Int, String>()
 
     //Инициализация нового объекта стримера-игрока
     init {
@@ -48,7 +48,7 @@ class StreamerPlayer(
         }
     }
 
-    fun checkExecution(amount: String): String? {
+    fun checkExecution(amount: Int): String? {
         return listOfAmounts[amount]
     }
 

@@ -10,14 +10,14 @@ import org.bukkit.entity.Player
 
 class DonateSubCommand(private val donationExecutor: DonationExecutor) : SubCommand {
     private fun onDonateCommand(sender: CommandSender, args: Array<out String>) {
-        val donationAmount = args[0]
+        val donationAmount = args[0].toFloat()
         val donationUsername = args
             .slice(1 until args.size)
             .joinToString(" ")
 
 
         donationExecutor.streamerPlayersManager.addToDonationsQueue(
-            Donation(donationUsername, "$donationAmount.00")
+            Donation(donationUsername, donationAmount)
         )
     }
 

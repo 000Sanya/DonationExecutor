@@ -37,16 +37,15 @@ class DonationAlertsConnection(
                 if (json.getInt("alert_type") != 1) {
                     return@runTask
                 }
-                val donationUsername = if (json.isNull("username")) {
-                    ""
-                } else {
-                    json.getString("username")
+                val donationUsername = when {
+                    json.isNull("username") -> ""
+                    else -> json.getString("username")
                 }
                 val donationAmount = json.getString("amount_formatted")
                 donationAlertsToken.addToDonationsQueue(
                     Donation(
                         donationUsername,
-                        donationAmount
+                        donationAmount.toFloat()
                     )
                 )
             }

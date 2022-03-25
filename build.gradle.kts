@@ -5,6 +5,7 @@
 plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("jvm") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.10"
 }
 
 repositories {
@@ -26,6 +27,11 @@ dependencies {
     implementation("io.socket:engine.io-client:0.8.3")
     implementation("io.socket:socket.io-client:0.8.3")
     implementation("org.json:json:20190722")
+    implementation("com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:1.6.0")
+    implementation("com.github.shynixn.mccoroutine:mccoroutine-bukkit-core:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
     compileOnly("io.papermc.paper:paper-api:1.18.1-R0.1-SNAPSHOT")
 }
 

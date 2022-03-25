@@ -1,17 +1,17 @@
 package igorlink.donationexecutor
 
+import com.github.shynixn.mccoroutine.SuspendingJavaPlugin
 import igorlink.command.DonationExecutorCommand
 import igorlink.donationexecutor.playersmanagement.StreamerPlayersManager
 import igorlink.service.MainConfig
 import org.bukkit.Bukkit
-import org.bukkit.plugin.java.JavaPlugin
 
-class DonationExecutor : JavaPlugin() {
+class DonationExecutor : SuspendingJavaPlugin() {
     lateinit var streamerPlayersManager: StreamerPlayersManager
     lateinit var executor: Executor
     lateinit var mainConfig: MainConfig
 
-    override fun onEnable() {
+    override suspend fun onEnableAsync() {
         mainConfig = MainConfig()
         mainConfig.reload(this)
         executor = Executor(this)
@@ -20,7 +20,7 @@ class DonationExecutor : JavaPlugin() {
         Bukkit.getPluginManager().registerEvents(GeneralEventListener(this), this)
     }
 
-    override fun onDisable() {
+    override suspend fun onDisableAsync() {
         streamerPlayersManager.stop()
     }
 

@@ -35,9 +35,7 @@ class StreamerPlayersManager(private val donationExecutor: DonationExecutor) {
 
     fun getStreamerPlayer(name: String): StreamerPlayer? {
         for (token in listOfDonationAlertsTokens) {
-            if (token.getStreamerPlayer(name) != null) {
-                return token.getStreamerPlayer(name)
-            }
+            return token.getStreamerPlayer(name)
         }
         return null
     }
@@ -62,9 +60,9 @@ class StreamerPlayersManager(private val donationExecutor: DonationExecutor) {
         listOfDonationAlertsTokens.clear()
     }
 
-    fun addToDonationsQueue(donation: Donation?) {
+    fun addToDonationsQueue(donation: Donation) {
         for (token in listOfDonationAlertsTokens) {
-            token.addToDonationsQueue(donation!!)
+            token.addToDonationsQueue(donation)
         }
     }
 

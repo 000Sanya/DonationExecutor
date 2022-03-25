@@ -21,7 +21,7 @@ class MainConfig {
     var isOptifineNotificationOn = false
         private set
     var showBigAnnouncement = false
-    private lateinit var amounts: MutableMap<String, Map<String, Map<String, String?>>>
+    private lateinit var amounts: MutableMap<String, Map<String, Map<String, Int?>>>
 
     //Загрузка данных из конфигфайла с указанным параметром перезагрузки
     fun reload(donationExecutor: DonationExecutor) {
@@ -42,13 +42,13 @@ class MainConfig {
         amounts = HashMap()
         val tokens = config.getConfigurationSection("donation-amounts")!!
         for (token in Objects.requireNonNull(tokens).getKeys(false)) {
-            val playersMap = HashMap<String, Map<String, String?>>()
+            val playersMap = HashMap<String, Map<String, Int?>>()
             val players = tokens.getConfigurationSection(token)
             for (player in Objects.requireNonNull(players)!!.getKeys(false)) {
-                val amountMap = HashMap<String, String?>()
+                val amountMap = HashMap<String, Int?>()
                 val amountSection = players!!.getConfigurationSection(player)
                 for (amountKey in Objects.requireNonNull(amountSection)!!.getKeys(false)) {
-                    amountMap[amountKey] = amountSection!!.getString(amountKey)
+                    amountMap[amountKey] = amountSection!!.getInt(amountKey)
                 }
                 playersMap[player] = amountMap
             }
@@ -56,7 +56,7 @@ class MainConfig {
         }
     }
 
-    fun getAmounts(): Map<String, Map<String, Map<String, String?>>> {
+    fun getAmounts(): Map<String, Map<String, Map<String, Int?>>> {
         return amounts
     }
 }

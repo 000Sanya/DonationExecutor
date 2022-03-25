@@ -15,7 +15,7 @@ import kotlin.random.Random
 data class ExecuteRequest(
     val player: Player,
     val donationUsername: String,
-    val donationAmount: String,
+    val donationAmount: Float,
 )
 
 class Executor(val donationExecutor: DonationExecutor) {
@@ -71,7 +71,7 @@ class Executor(val donationExecutor: DonationExecutor) {
         onExecute("DonateScreamer", ::donateScreamer)
     }
 
-    fun doExecute(streamerName: String, donationUsername: String, fullDonationAmount: String, executionName: String) {
+    fun doExecute(streamerName: String, donationUsername: String, fullDonationAmount: Float, executionName: String) {
         val streamerPlayer = Bukkit.getPlayerExact(streamerName)
 
         //Определяем игрока (если он оффлайн - не выполняем донат и пишем об этом в консоль), а также определяем мир, местоположение и направление игрока

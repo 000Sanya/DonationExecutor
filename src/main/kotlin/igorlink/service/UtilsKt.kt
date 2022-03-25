@@ -26,25 +26,18 @@ fun decodeUsingBigInteger(hexString: String): ByteArray? {
     return byteArray
 }
 
-fun announce(donaterName: String, subText: String, alterSubtext: String, player: Player, donationAmount: String, bigAnnounce: Boolean, mainConfig: MainConfig) {
+fun announce(donaterName: String, subText: String, alterSubtext: String, player: Player, donationAmount: Float, bigAnnounce: Boolean, mainConfig: MainConfig) {
     val _donaterName = donaterName.ifBlank { "Кто-то" }
+    val donationAmountString = "%.2f".format(donationAmount)
     if (bigAnnounce) {
-        if (mainConfig.showBigAnnouncement) {
-            player.sendTitle("§c$_donaterName", "§f$subText за §b$donationAmount§f руб.", 7, mainConfig.timeForAnnouncement * 20, 7)
-        }
-        player.sendMessage("§c[DE] §fДонатер §c$_donaterName", "§f$subText за §b$donationAmount§f руб.")
+        player.sendTitle("§c$_donaterName", "§f$subText за §b$donationAmountString§f руб.", 7, mainConfig.timeForAnnouncement * 20, 7)
+        player.sendMessage("§c[DE] §fДонатер §c$_donaterName", "§f$subText за §b$donationAmountString§f руб.")
     }
     for (p in Bukkit.getOnlinePlayers()) {
         if (p.name != player.name) {
-            p.sendMessage("§c[DE] §fДонатер §c$_donaterName §f$alterSubtext §b${player.name} за §b$donationAmount§f руб.")
+            p.sendMessage("§c[DE] §fДонатер §c$_donaterName §f$alterSubtext §b${player.name} за §b$donationAmountString§f руб.")
         }
     }
-}
-
-fun cutOffKopeykis(donationAmountWithKopeykis: String): String {
-    return donationAmountWithKopeykis
-        .filter { it != ' ' }
-        .takeWhile { it != '.' }
 }
 
 private val mapOfSynonimousChars = mapOf(
